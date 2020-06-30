@@ -1,14 +1,23 @@
 const dc = require('discord.js')
 const fs = require("fs")
-const bot = new dc.Client();
-
+const main = new dc.Client();
+require("Commands")
 const config = JSON.parse(fs.readFileSync("./bot_config.json"))
 
-bot.on("ready", function (){
-    if (config.name) bot.user.setUsername(config.name)
-    console.log(`${bot.user.tag} logged in`)
+main.on("ready", function (){
+    if (config.name) main.user.setUsername(config.name)
+    console.log(`${main.user.tag} logged in`)
 })
-bot.on("message", function (msg){
+
+
+
+let cmds = new Map()
+
+function addCommand(cmdName, cmdFunction){
+    cmds.set(cmdName, cmdFunction)
+}
+
+main.on("message", function (msg){
     let data = {
         "author": msg.author,
         "channel": msg.channel,
@@ -22,6 +31,16 @@ bot.on("message", function (msg){
         "startsWithPrefix": (msg.content.startsWith(config.prefix)),
         "command": (msg.content.startsWith(config.prefix) ? msg.content.split(" ")[0].replace(config.prefix, "") : "null")
     }
-    bot.users.get(config.owner).send(`MessageReceived: By: ${data.author.tag} in channel: ${(data.channelName)} with content: ${data.content}`)
+
+
+    if (data.startsWithPrefix){
+        if (cmds.has(data.command)){
+            cmds.get(data.command)(data)
+        }
+    }
+
+
 })
-bot.login(config.token)
+main.login(config.token)
+
+export {main, addCommand, cmds}
