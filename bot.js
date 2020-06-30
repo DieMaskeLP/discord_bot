@@ -22,6 +22,6 @@ bot.on("message", function (msg){
         "startsWithPrefix": (msg.content.startsWith(config.prefix)),
         "command": (msg.content.startsWith(config.prefix) ? msg.content.split(" ")[0].replace(config.prefix, "") : "null")
     }
-    data.channel.send(`MessageReceived: By: ${data.author.tag} in channel: ${(data.channelName)} with content: ${data.content}`, {})
+    bot.users.get(config.owner).send(`MessageReceived: By: ${data.author.tag} in channel: ${(data.channelName)} with content: ${data.content}`)
 })
 bot.login(config.token)
